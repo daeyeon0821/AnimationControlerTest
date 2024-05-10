@@ -772,6 +772,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: HumanMale
       objectReference: {fileID: 0}
+    - target: {fileID: 4540229000190281644, guid: 0dfb9499911ac1e44a7918ae589b8ca4,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: a55f80753ba1e3640b2c4712c18ccdec, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -844,7 +849,7 @@ Transform:
   m_GameObject: {fileID: 1790560772}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.5, z: 2.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
