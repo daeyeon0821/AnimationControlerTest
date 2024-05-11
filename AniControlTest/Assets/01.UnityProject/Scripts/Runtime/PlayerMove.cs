@@ -1,34 +1,97 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMove : MonoBehaviour
 {
     [Header("플레이어의 움직임 설정")]
     [Range(0f, 10f)]
     public float moveSpeed = 0f;
-    private Vector3 tempPosition = default;
+    private Coroutine moveHorizontal = default;
+    private Coroutine moveVertical = default;
 
-    // Start is called before the first frame update
-    void Start()
+    private Rigidbody rigidbody = default;
+
+    private void Awake()
     {
-        
+        rigidbody = GetComponent<Rigidbody>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void OnMoveHorizontal(InputAction.CallbackContext context)
     {
-        if(Input.GetKey(KeyCode.A))
+        if(context.started == true)
         {
-            tempPosition = this.transform.position;
-            tempPosition.x = tempPosition.x + (-1 * moveSpeed * Time.deltaTime);
-            this.transform.position = tempPosition;
-        }       // if: 왼쪽 키를 누른 경우
-        else if (Input.GetKey(KeyCode.D))
+            StopMove(moveHorizontal);
+            moveHorizontal = StartCoroutine(DoMove(context));
+        }   // if: 입력이 확인되면 움직이기 시작한다.
+        else if (context.canceled == true)
         {
-            tempPosition = this.transform.position;
-            tempPosition.x = tempPosition.x + (moveSpeed * Time.deltaTime);
-            this.transform.position = tempPosition;
-        }       // if: 오른쪽 키를 누른 경우
-    }       // Update()
+            StopMove(moveHorizontal);
+        }   // if: 입력이 종료되면 멈춘다.
+    }       // OnMoveHorizontal()
+
+    public void OnMoveVertical(InputAction.CallbackContext context)
+    {
+        if (context.started == true)
+        {
+            StopMove(moveVertical);
+            moveVertical = StartCoroutine(DoMove(context));
+        }   // if: 입력이 확인되면 움직이기 시작한다.
+        else if (context.canceled == true)
+        {
+            StopMove(moveVertical);
+        }   // if: 입력이 종료되면 멈춘다.
+    }       // OnMoveHorizontal()
+
+    private IEnumerator DoMove(InputAction.CallbackContext context)
+    {
+        Vector2 inputAxis = default;
+
+        Vector3 moveDirection = default;
+        Vector3 moveVelo = default;
+
+        // 컨트롤러의 방향을 받아서 캐싱한다.
+        inputAxis = context.ReadValue<Vector2>();
+        if (inputAxis.x < 0f)
+        {
+            moveDirection = Vector3.left;
+        }   // if: 왼쪽 방향인 경우
+        else if (0f < inputAxis.x)
+        {
+            moveDirection = Vector3.right;
+        }   // if: 오른쪽 방향인 경우
+        else if (0f < inputAxis.y)
+        {
+            moveDirection = Vector3.forward;
+        }   // if: 앞쪽 방향인 경우
+        else if (inputAxis.y < 0f)
+        {
+            moveDirection = Vector3.back;
+        }   // if: 뒤쪽 방향인 경우
+
+        while (true)
+        {
+            // 키를 누르고 있는 동안 움직인다.
+            moveVelo = moveDirection * moveSpeed * 100f * Time.fixedDeltaTime;
+            rigidbody.velocity = moveVelo;
+
+            yield return null;
+        }   // loop: 움직이는 키 입력받는 동안 반복하는 루프
+    }       // DoMove()
+
+    private void StopMove(Coroutine moveRoutine)
+    {
+        if (moveRoutine == null) { return; }
+
+        StopCoroutine(moveRoutine);
+        rigidbody.velocity = rigidbody.velocity * 0.5f;
+        moveRoutine = null;
+    }   // StopMove()
+
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        // performed 상태에서만 동작한다.
+        Debug.Log("Call Jump !!!");
+    }
 }
