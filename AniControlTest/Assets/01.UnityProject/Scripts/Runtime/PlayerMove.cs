@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 public class PlayerMove : MonoBehaviour
 {
     [Header("플레이어의 움직임 설정")]
+    [Tooltip("플레이어의 이동속도를 조절하는 옵션")]
     [Range(0f, 10f)]
     public float moveSpeed = 0f;
     private Coroutine moveHorizontal = default;
@@ -85,13 +86,14 @@ public class PlayerMove : MonoBehaviour
         if (moveRoutine == null) { return; }
 
         StopCoroutine(moveRoutine);
+        // 자연스럽게 멈추기 위해서 움직이는 속도를 임의로 절반 감속한다.
         rigidbody.velocity = rigidbody.velocity * 0.5f;
         moveRoutine = null;
     }   // StopMove()
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        // performed 상태에서만 동작한다.
+        // TODO: performed 상태에서만 동작하도록 구현할 것.
         Debug.Log("Call Jump !!!");
     }
 }
