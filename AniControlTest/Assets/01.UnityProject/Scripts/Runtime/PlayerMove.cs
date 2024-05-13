@@ -19,31 +19,52 @@ public class PlayerMove : MonoBehaviour
         rigidbody = GetComponent<Rigidbody>();
     }
 
+    #region 플레이어의 이동
+    //! Horizontal axis 입력을 받기 위한 함수
     public void OnMoveHorizontal(InputAction.CallbackContext context)
     {
-        if(context.started == true)
-        {
-            StopMove(moveHorizontal);
-            moveHorizontal = StartCoroutine(DoMove(context));
-        }   // if: 입력이 확인되면 움직이기 시작한다.
-        else if (context.canceled == true)
-        {
-            StopMove(moveHorizontal);
-        }   // if: 입력이 종료되면 멈춘다.
+        //if(context.started == true)
+        //{
+        //    StopMove(moveHorizontal);
+        //    moveHorizontal = StartCoroutine(DoMove(context));
+        //}   // if: 입력이 확인되면 움직이기 시작한다.
+        //else if (context.canceled == true)
+        //{
+        //    StopMove(moveHorizontal);
+        //}   // if: 입력이 종료되면 멈춘다.
+
+        OnMove(context, ref moveHorizontal);
     }       // OnMoveHorizontal()
 
+    //! Vertical axis 입력을 받기 위한 함수
     public void OnMoveVertical(InputAction.CallbackContext context)
+    {
+        //if (context.started == true)
+        //{
+        //    StopMove(moveVertical);
+        //    moveVertical = StartCoroutine(DoMove(context));
+        //}   // if: 입력이 확인되면 움직이기 시작한다.
+        //else if (context.canceled == true)
+        //{
+        //    StopMove(moveVertical);
+        //}   // if: 입력이 종료되면 멈춘다.
+
+        OnMove(context, ref moveVertical);
+    }       // OnMoveHorizontal()
+
+    //! Horizontal, Vertical 중복 연산을 한 곳에서 처리하는 함수
+    private void OnMove(InputAction.CallbackContext context, ref Coroutine moveRoutine)
     {
         if (context.started == true)
         {
-            StopMove(moveVertical);
-            moveVertical = StartCoroutine(DoMove(context));
+            StopMove(moveRoutine);
+            moveRoutine = StartCoroutine(DoMove(context));
         }   // if: 입력이 확인되면 움직이기 시작한다.
         else if (context.canceled == true)
         {
-            StopMove(moveVertical);
+            StopMove(moveRoutine);
         }   // if: 입력이 종료되면 멈춘다.
-    }       // OnMoveHorizontal()
+    }   // OnMove()
 
     private IEnumerator DoMove(InputAction.CallbackContext context)
     {
@@ -90,6 +111,12 @@ public class PlayerMove : MonoBehaviour
         rigidbody.velocity = rigidbody.velocity * 0.5f;
         moveRoutine = null;
     }   // StopMove()
+    #endregion  // 플레이어의 이동
+
+    private void RotatePlayer()
+    {
+
+    }
 
     public void OnJump(InputAction.CallbackContext context)
     {
