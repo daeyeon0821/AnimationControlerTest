@@ -15,8 +15,6 @@ public class PlayerMove : MonoBehaviour
     [Tooltip("플레이어의 이동속도를 조절하는 옵션")]
     [Range(0f, 10f)]
     public float moveSpeed = 0f;
-    //private Coroutine moveHorizontal = default;
-    //private Coroutine moveVertical = default;
 
     private Coroutine moveRoutine = default;    /** 플레이어를 움직이는 함수 */
 
@@ -25,6 +23,7 @@ public class PlayerMove : MonoBehaviour
 
     private bool isMove = false;    /** 플레이어의 이동 상태 */
     private Vector3 moveDirection = Vector3.zero;   /** 플레이어가 이동할 방향 */
+    private bool isLockInput = false;   /** 플레이어의 키입력 잠금 상태 */
     private void Awake()
     {
         rgbody = GetComponent<Rigidbody>();
@@ -35,29 +34,41 @@ public class PlayerMove : MonoBehaviour
     //! Horizontal axis 입력을 받기 위한 함수
     public void OnMoveHorizontal(InputAction.CallbackContext context)
     {
+        // 플레이어의 키 입력을 막은 경우 리턴한다.
+        if (isLockInput == true) { return; }
+
         Move_Player(context);
-        //Cancel_HorizontalMove(context);
         Cancel_Moving(context, true);
     }       // OnMoveHorizontal()
 
     //! Vertical axis 입력을 받기 위한 함수
     public void OnMoveVertical(InputAction.CallbackContext context)
     {
+        // 플레이어의 키 입력을 막은 경우 리턴한다.
+        if (isLockInput == true) { return; }
+
         Move_Player(context);
-        //Cancel_VerticalMove(context);
         Cancel_Moving(context, false);
     }       // OnMoveHorizontal()
+
+    //! 플레이어를 바라보는 방향으로 움직이는 함수
+    public void OnMove(float moveSpeed_)
+    {
+        moveDirection = transform.forward;
+
+        // 플레이어를 이동한다.
+        moveRoutine = StartCoroutine(DoMove(moveSpeed_));
+    }   // OnMove()
 
     //! Horizontal, Vertical axis로 플레이어의 인게임 움직임을 결정하는 함수
     private void Move_Player(InputAction.CallbackContext context)
     {
-        if (context.started == false) { return; }
+        if (context.performed == false) { return; }
         
         // 입력이 확인되면 플레이어를 움직인다.
 
         // 기존에 달리던 방향을 캔슬하고 새로운 방향으로 달린다.
         StopMove(ref moveRoutine);
-        isMove = false;
 
         // 컨트롤러의 방향을 받아서 캐싱한다.
         Vector2 inputAxis = default;
@@ -67,7 +78,7 @@ public class PlayerMove : MonoBehaviour
         Rotate_Player(inputAxis, out moveDirection);
 
         // 플레이어를 이동한다.
-        moveRoutine = StartCoroutine(DoMove());
+        moveRoutine = StartCoroutine(DoMove(moveSpeed));
 
         // 이동하는 애니메이션을 재생한다.
         isMove = true;
@@ -94,11 +105,26 @@ public class PlayerMove : MonoBehaviour
         StopMove(ref moveRoutine);
 
         // 멈추는 애니메이션을 재생한다.
-        isMove = false;
         animator.SetBool("IsMove", isMove);
     }   // Cancel_Moving()
 
-    private IEnumerator DoMove()
+    //// LEGACY:
+    //private IEnumerator DoMove()
+    //{
+    //    Vector3 moveVelo = default;
+
+    //    while (true)
+    //    {
+    //        // 키를 누르고 있는 동안 움직인다.
+    //        // 자연스럽게 움직이기 위해서 임의의 보정값 100을 곱해준다.
+    //        moveVelo = moveDirection * moveSpeed * 100f * Time.fixedDeltaTime;
+    //        rgbody.velocity = moveVelo;
+
+    //        yield return null;
+    //    }   // loop: 움직이는 키 입력받는 동안 반복하는 루프
+    //}       // DoMove()
+
+    private IEnumerator DoMove(float moveSpeed_)
     {
         Vector3 moveVelo = default;
 
@@ -106,12 +132,18 @@ public class PlayerMove : MonoBehaviour
         {
             // 키를 누르고 있는 동안 움직인다.
             // 자연스럽게 움직이기 위해서 임의의 보정값 100을 곱해준다.
-            moveVelo = moveDirection * moveSpeed * 100f * Time.fixedDeltaTime;
+            moveVelo = moveDirection * moveSpeed_ * 100f * Time.fixedDeltaTime;
             rgbody.velocity = moveVelo;
 
             yield return null;
         }   // loop: 움직이는 키 입력받는 동안 반복하는 루프
     }       // DoMove()
+
+    public void Lock_PlayerMove(bool isLock)
+    {
+        isLockInput = isLock;
+        StopMove(ref moveRoutine);
+    }   // Lock_PlayerMove()
 
     private void StopMove(ref Coroutine moveRoutine)
     {
@@ -124,6 +156,8 @@ public class PlayerMove : MonoBehaviour
         // 움직였던 방향을 정리한다.
         inputDirection = InputDirection.NONE;
         moveDirection = Vector3.zero;
+
+        isMove = false;
 
         moveRoutine = null;
     }   // StopMove()
@@ -173,10 +207,4 @@ public class PlayerMove : MonoBehaviour
 
         transform.Rotate(rotationEuler);
     }   // Rotate_Player()
-
-    public void OnJump(InputAction.CallbackContext context)
-    {
-        // TODO: performed 상태에서만 동작하도록 구현할 것.
-        Debug.Log("Call Jump !!!");
-    }
 }
