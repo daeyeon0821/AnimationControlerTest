@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -21,9 +22,10 @@ public class PlayerMove : MonoBehaviour
     private Rigidbody rgbody = default;
     private Animator animator = default;
 
-    private bool isMove = false;    /** 플레이어의 이동 상태 */
     private Vector3 moveDirection = Vector3.zero;   /** 플레이어가 이동할 방향 */
     private bool isLockInput = false;   /** 플레이어의 키입력 잠금 상태 */
+
+    private bool isPlay_MoveAni = false;    /** 플레이어의 이동 애니메이션 재생 상태 */
     private void Awake()
     {
         rgbody = GetComponent<Rigidbody>();
@@ -81,8 +83,7 @@ public class PlayerMove : MonoBehaviour
         moveRoutine = StartCoroutine(DoMove(moveSpeed));
 
         // 이동하는 애니메이션을 재생한다.
-        isMove = true;
-        animator.SetBool("IsMove", isMove);
+        Play_MoveAni(true);
     }   // OnMove()
 
     private void Cancel_Moving(InputAction.CallbackContext context, bool isHorizontal)
@@ -105,7 +106,7 @@ public class PlayerMove : MonoBehaviour
         StopMove(ref moveRoutine);
 
         // 멈추는 애니메이션을 재생한다.
-        animator.SetBool("IsMove", isMove);
+        Play_MoveAni(false);
     }   // Cancel_Moving()
 
     //// LEGACY:
@@ -157,8 +158,6 @@ public class PlayerMove : MonoBehaviour
         inputDirection = InputDirection.NONE;
         moveDirection = Vector3.zero;
 
-        isMove = false;
-
         moveRoutine = null;
     }   // StopMove()
     #endregion  // 플레이어의 이동
@@ -207,4 +206,11 @@ public class PlayerMove : MonoBehaviour
 
         transform.Rotate(rotationEuler);
     }   // Rotate_Player()
+
+    //! Move와 Idle 상태로 전이하는 애니메이션을 재생하는 함수
+    public void Play_MoveAni(bool isMove_)
+    {
+        isPlay_MoveAni = isMove_;
+        animator.SetBool("IsMove", isPlay_MoveAni);
+    }   // Play_IdleAni()
 }

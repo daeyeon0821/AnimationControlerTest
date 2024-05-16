@@ -60,6 +60,7 @@ public class PlayerSkill : MonoBehaviour
     {
         isRunSkill_1 = true;
         playerMove.Lock_PlayerMove(true);
+        // Push 하는 동안 Move 애니메이션을 재생하지 않고 플레이어를 이동한다.
         playerMove.OnMove(pushPower);
     }   // Start_Skill_1()
 
@@ -68,5 +69,7 @@ public class PlayerSkill : MonoBehaviour
     {
         playerMove.Lock_PlayerMove(false);
         isRunSkill_1 = false;
+        // 발차기가 끝난 후 Idle 애니메이션을 재생한다.
+        playerMove.Play_MoveAni(false);
     }   // End_Skill_1()
 }
