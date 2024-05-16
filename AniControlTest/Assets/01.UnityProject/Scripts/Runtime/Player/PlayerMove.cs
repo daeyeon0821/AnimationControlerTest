@@ -23,6 +23,11 @@ public class PlayerMove : MonoBehaviour
     private Animator animator = default;
 
     private Vector3 moveDirection = Vector3.zero;   /** 플레이어가 이동할 방향 */
+    public Vector3 MoveDirection
+    {
+        get { return moveDirection; }
+        private set { moveDirection = value; }
+    }
     private bool isLockInput = false;   /** 플레이어의 키입력 잠금 상태 */
 
     private bool isPlay_MoveAni = false;    /** 플레이어의 이동 애니메이션 재생 상태 */
@@ -59,7 +64,7 @@ public class PlayerMove : MonoBehaviour
         moveDirection = transform.forward;
 
         // 플레이어를 이동한다.
-        moveRoutine = StartCoroutine(DoMove(moveSpeed_));
+        moveRoutine = StartCoroutine(DoMove(moveDirection, moveSpeed_));
     }   // OnMove()
 
     //! Horizontal, Vertical axis로 플레이어의 인게임 움직임을 결정하는 함수
@@ -80,7 +85,7 @@ public class PlayerMove : MonoBehaviour
         Rotate_Player(inputAxis, out moveDirection);
 
         // 플레이어를 이동한다.
-        moveRoutine = StartCoroutine(DoMove(moveSpeed));
+        moveRoutine = StartCoroutine(DoMove(moveDirection, moveSpeed));
 
         // 이동하는 애니메이션을 재생한다.
         Play_MoveAni(true);
@@ -109,23 +114,7 @@ public class PlayerMove : MonoBehaviour
         Play_MoveAni(false);
     }   // Cancel_Moving()
 
-    //// LEGACY:
-    //private IEnumerator DoMove()
-    //{
-    //    Vector3 moveVelo = default;
-
-    //    while (true)
-    //    {
-    //        // 키를 누르고 있는 동안 움직인다.
-    //        // 자연스럽게 움직이기 위해서 임의의 보정값 100을 곱해준다.
-    //        moveVelo = moveDirection * moveSpeed * 100f * Time.fixedDeltaTime;
-    //        rgbody.velocity = moveVelo;
-
-    //        yield return null;
-    //    }   // loop: 움직이는 키 입력받는 동안 반복하는 루프
-    //}       // DoMove()
-
-    private IEnumerator DoMove(float moveSpeed_)
+    private IEnumerator DoMove(Vector3 moveDirection_, float moveSpeed_)
     {
         Vector3 moveVelo = default;
 
@@ -133,7 +122,7 @@ public class PlayerMove : MonoBehaviour
         {
             // 키를 누르고 있는 동안 움직인다.
             // 자연스럽게 움직이기 위해서 임의의 보정값 100을 곱해준다.
-            moveVelo = moveDirection * moveSpeed_ * 100f * Time.fixedDeltaTime;
+            moveVelo = moveDirection_ * moveSpeed_ * 100f * Time.fixedDeltaTime;
             rgbody.velocity = moveVelo;
 
             yield return null;

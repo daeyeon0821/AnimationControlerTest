@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -15,14 +16,17 @@ public class PlayerSkill : MonoBehaviour
     public float pushDurationSeconds = 0f;
     private WaitForSeconds pushDuration = default;
     [Range(0f, 1f)]
-    [Tooltip("Skill 1에서 미는 힘")]
-    public float pushPower = 0f;
+    [Tooltip("Skill 1에서 미는 속도")]
+    public float pushSpeed = 0f;
+    [Header("Skill 1 발동을 위한 변수")]
+    [Tooltip("Skill 1에서 손으로 밀어줄 콜라이더")]
+    public PushColliderObj pushCollider = default;
 
-    private bool isRunSkill_1 = false;
-
-    private KickState kickState = default;
     private PushState pushState = default;
+    private KickState kickState = default;
 
+    private bool isRunSkill_1 = false;  /** 스킬1이 동작하는 상태 */
+    private IPushable pushableObj = default;   /** 밀 수 있는 오브젝트 */
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -31,7 +35,7 @@ public class PlayerSkill : MonoBehaviour
         // { Skill 1 초기화
         pushState = animator.GetBehaviour<PushState>();
         pushState.enterRoutine = Start_Skill_1;
-        pushState.exitRoutine = () => { playerMove.Lock_PlayerMove(true); };
+        pushState.exitRoutine = End_PushState;
         kickState = animator.GetBehaviour<KickState>();
         kickState.exitRoutine = End_Skill_1;
 
@@ -46,6 +50,9 @@ public class PlayerSkill : MonoBehaviour
         if (isRunSkill_1 == true) { return; }
 
         StartCoroutine(DoPushAni());
+
+        // 밀 수 있는 오브젝트를 감지한다.
+        pushCollider.gameObject.SetActive(true);
     }   // OnSkill_1()
 
     private IEnumerator DoPushAni()
@@ -61,8 +68,15 @@ public class PlayerSkill : MonoBehaviour
         isRunSkill_1 = true;
         playerMove.Lock_PlayerMove(true);
         // Push 하는 동안 Move 애니메이션을 재생하지 않고 플레이어를 이동한다.
-        playerMove.OnMove(pushPower);
+        playerMove.OnMove(pushSpeed);
     }   // Start_Skill_1()
+
+    //! 밀기 동작이 끝났을 때 동작하는 함수
+    private void End_PushState()
+    {
+        playerMove.Lock_PlayerMove(true);
+        pushCollider.gameObject.SetActive(false);
+    }   // End_PushState()
 
     //! Skill 1이 끝날 때 동작하는 함수
     private void End_Skill_1()
@@ -72,4 +86,17 @@ public class PlayerSkill : MonoBehaviour
         // 발차기가 끝난 후 Idle 애니메이션을 재생한다.
         playerMove.Play_MoveAni(false);
     }   // End_Skill_1()
+
+    //! 밀 수 있는 오브젝트를 민다.
+    public void OnPush(IPushable target)
+    {
+        pushableObj = target;
+        if (pushableObj == default) { return; }
+
+        //// DEBUG:
+        //Debug.LogFormat("밀기 가능한 오브젝트 입니다. {0}", target.GetGameObject().name);
+
+        pushableObj.OnPush(playerMove.MoveDirection, pushSpeed, pushDuration);
+        pushableObj = default;
+    }   // OnPush()
 }
