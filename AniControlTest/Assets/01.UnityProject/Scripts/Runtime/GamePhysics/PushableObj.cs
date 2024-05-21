@@ -18,6 +18,17 @@ public class PushableObj : MonoBehaviour, IPushable
         StartCoroutine(StopMove(moveDuration));
     }   // OnPush()
 
+    public void OnImpact(Vector3 moveDirection, float power)
+    {
+        Vector3 forceVector = moveDirection * power;
+        // 움직이기 전에 Kinematic 옵션을 끈다.
+        rgbody.isKinematic = false;
+        rgbody.AddForce(forceVector, ForceMode.Impulse);
+
+        // 일정 시간 이후에 Kinematic 옵션을 끈다.
+        StartCoroutine(StopMove(new WaitForSeconds(0.5f)));
+    }   // OnImpact()
+
     public GameObject GetGameObject()
     {
         return this.gameObject;
@@ -49,7 +60,7 @@ public class PushableObj : MonoBehaviour, IPushable
             StopCoroutine(moveRoutine);
             moveRoutine = default;
 
-            rgbody.isKinematic = true;
         }
+        rgbody.isKinematic = true;
     }   // StopMove()
 }

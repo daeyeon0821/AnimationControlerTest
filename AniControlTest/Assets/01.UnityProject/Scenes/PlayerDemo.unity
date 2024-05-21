@@ -1052,6 +1052,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6285178811246398680, guid: 0dfb9499911ac1e44a7918ae589b8ca4,
         type: 3}
+      propertyPath: kickPower
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6285178811246398680, guid: 0dfb9499911ac1e44a7918ae589b8ca4,
+        type: 3}
       propertyPath: pushPower
       value: 0.25
       objectReference: {fileID: 0}

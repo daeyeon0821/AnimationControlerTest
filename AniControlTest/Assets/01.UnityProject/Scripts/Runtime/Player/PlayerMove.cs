@@ -99,12 +99,14 @@ public class PlayerMove : MonoBehaviour
         if(isHorizontal)
         {
             // 움직이는 방향이 Vertical인 경우 리턴한다.
-            if (inputDirection.Equals(InputDirection.FORWARD) || inputDirection.Equals(InputDirection.BACK)) { return; }
+            if (inputDirection.Equals(InputDirection.FORWARD) || 
+                inputDirection.Equals(InputDirection.BACK)) { return; }
         }   // if: 가로 입력을 받은 경우
         else
         {
             // 움직이는 방향이 Horizontal인 경우 리턴한다.
-            if (inputDirection.Equals(InputDirection.LEFT) || inputDirection.Equals(InputDirection.RIGHT)) { return; }
+            if (inputDirection.Equals(InputDirection.LEFT) || 
+                inputDirection.Equals(InputDirection.RIGHT)) { return; }
         }   // else: 세로 입력을 받은 경우
 
         // 움직이는 방향과 캔슬하려는 방향이 일치하면 플레이어를 멈춘다.
