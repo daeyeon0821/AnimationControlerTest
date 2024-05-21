@@ -21,6 +21,8 @@ public class PlayerSkill : MonoBehaviour
     [Header("Skill 1 발동을 위한 변수")]
     [Tooltip("Skill 1에서 손으로 밀어줄 콜라이더")]
     public PushColliderObj pushCollider = default;
+    [Tooltip("Skill 1에서 콜라이더가 이동할 위치")]
+    public GameObject pushPosition = default;
 
     private PushState pushState = default;
     private KickState kickState = default;
@@ -40,6 +42,9 @@ public class PlayerSkill : MonoBehaviour
         kickState.exitRoutine = End_Skill_1;
 
         pushDuration = new WaitForSeconds(pushDurationSeconds);
+        pushCollider.gameObject.SetActive(false);
+        pushCollider.transform.localPosition = Vector3.zero;
+        pushPosition.SetActive(false);
         // } Skill 1 초기화
     }   // Awake()
 
@@ -51,7 +56,9 @@ public class PlayerSkill : MonoBehaviour
 
         StartCoroutine(DoPushAni());
 
-        // 밀 수 있는 오브젝트를 감지한다.
+        // 밀기 콜라이더를 손으로 이동한다.
+        // 밀 수 있는 오브젝트를 콜라이더로 감지한다.
+        pushCollider.transform.position = pushPosition.transform.position;
         pushCollider.gameObject.SetActive(true);
     }   // OnSkill_1()
 
@@ -75,7 +82,9 @@ public class PlayerSkill : MonoBehaviour
     private void End_PushState()
     {
         playerMove.Lock_PlayerMove(true);
+        // 밀기 콜라이더를 제자리로 되돌린다.
         pushCollider.gameObject.SetActive(false);
+        pushCollider.transform.localPosition = Vector3.zero;
     }   // End_PushState()
 
     //! Skill 1이 끝날 때 동작하는 함수

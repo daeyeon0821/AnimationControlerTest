@@ -11,7 +11,6 @@ public class PushColliderObj : MonoBehaviour
     {
         pushableObj = other.GetComponent<IPushable>();
         if (pushableObj == default) { return; }
-
        
         playerSkill.OnPush(pushableObj);
         this.gameObject.SetActive(false);
